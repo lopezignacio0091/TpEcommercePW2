@@ -17,7 +17,6 @@ import com.context.service.ReportService;
 @Validated
 public class ReportController {
 
-	
 	private final ReportService service;
 	
 	public ReportController(ReportService service) {
@@ -25,10 +24,11 @@ public class ReportController {
 		this.service = service;
 	}
 	
-	@PostMapping(path = "/batch/processCarts")
+	@PostMapping(path ="/batch/processCarts")
 	public ResponseEntity<Object> batchProcess(){
+		
 		service.getProcessedCarts();
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);	
 	}
 	
 }

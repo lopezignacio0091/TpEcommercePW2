@@ -14,5 +14,6 @@ public interface ProductService {
 	Long post(ProductDTO product);
 	Long put (ProductDTO product);
 	void deleteById(Long id);
+	void msj();
 
 }

@@ -1,7 +1,6 @@
 package com.context.service.impl;
 
 import com.context.model.Cart;
-import com.context.model.CartProcessed;
 import com.context.model.CartProduct;
 import com.context.model.CartProductKey;
 import com.context.model.Product;
@@ -38,8 +37,7 @@ public class CartServiceImpl implements CartService {
 	private final ProductRepository productRepo;
 	private final CartProductRepository cartProductRepo;
 
-	public CartServiceImpl(CartRepository cartRepo, ProductRepository productRepo,
-			CartProductRepository cartProductRepo) {
+	public CartServiceImpl(CartRepository cartRepo, ProductRepository productRepo,CartProductRepository cartProductRepo) {
 		super();
 		this.cartRepo = cartRepo;
 		this.productRepo = productRepo;
@@ -112,8 +110,7 @@ public class CartServiceImpl implements CartService {
 
 						cart.get().setCreationDate(LocalDate.now());
 
-						BigDecimal totalNew = (product.get().getUnitPrice()
-								.multiply(BigDecimal.valueOf(cartproductDTO.getQuantity())));
+						BigDecimal totalNew = (product.get().getUnitPrice().multiply(BigDecimal.valueOf(cartproductDTO.getQuantity())));
 						cart.get().setTotal((cart.get().getTotal().add(totalNew)));
 						cart.get().setStatus(Status.NEW);
 						
@@ -137,9 +134,6 @@ public class CartServiceImpl implements CartService {
 		}
 	}
 
-	/**
-	 *
-	 */
 	@Override
 	public void deleteProductCart(Long id, Long idProduct) {
 
@@ -164,7 +158,8 @@ public class CartServiceImpl implements CartService {
 			Optional<CartProduct> cartProduct = cartProductRepo.findById(key);
 
 			cart.get().setTotal(cart.get().getTotal().subtract(
-					cartProduct.get().getPrecio().multiply(BigDecimal.valueOf(cartProduct.get().getQuantity()))));
+			cartProduct.get().getPrecio().multiply(BigDecimal.valueOf(cartProduct.get().getQuantity()))));
+			
 			cartProductRepo.deleteById(key);
 		}
 	}
@@ -230,49 +225,4 @@ public class CartServiceImpl implements CartService {
 		}
 	}
 
-	public void batchProcessCart() {
-
-		CartProcessed procesados = new CartProcessed();
-		procesados.setProfit(BigDecimal.ZERO);
-		procesados.setTotalCartsFailed(0);
-		procesados.setTotalCartsProcessed(0);
-
-		List<Cart> cart = cartRepo.findByOrderByCheckDateAsc();
-		Set<Product> productosSinStock = new HashSet<Product>();
-
-		for (Cart carts : cart) {
-			if (carts.getStatus() == Status.READY) {
-				List<CartProduct> cartProducts = new ArrayList<CartProduct>(carts.getProducts());
-				boolean success = true;
-                
-				for (CartProduct cartP : cartProducts) {
-					if (cartP.getQuantity() > cartP.getProduct().getStock()) {
-						success = false;
-					}
-					if (cartP.getProduct().getStock() == 0) {
-						productosSinStock.add(cartP.getProduct());
-					}
-
-				}
-				
-				if (success) {
-					for (CartProduct cartP : cartProducts) {
-						cartP.getProduct().setStock(cartP.getProduct().getStock() - cartP.getQuantity());
-						productRepo.save(cartP.getProduct());
-					}
-					procesados.setProfit(procesados.getProfit().add(carts.getTotal()));
-					carts.setStatus(Status.PROCESSED);
-				} else {
-					carts.setStatus(Status.FAILED);
-					procesados.setTotalCartsFailed(procesados.getTotalCartsFailed() + 1);
-				}
-
-				procesados.setTotalCartsProcessed(procesados.getTotalCartsProcessed() + 1);
-				cartRepo.save(carts);
-				System.out.println(carts.getId() + " Esta en estado " + carts.getStatus());
-			}
-		}
-		procesados.setProductStock(productosSinStock);
-
-	}
 }

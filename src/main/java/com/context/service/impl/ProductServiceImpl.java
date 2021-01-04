@@ -72,15 +72,11 @@ private final ProductRepository productRepo;
 	public Long put(ProductDTO productDTO) {
     
 		Optional<Product> product = productRepo.findById(productDTO.getId());
-		Product productNuevo = new Product();
+		Product productNew= new Product();
 		
 		if (product.isPresent()) {
-			
-			BeanUtils.copyProperties(productDTO, productNuevo);
-			product.get().setUnitPrice(productDTO.getUnitPrice());
-			product.get().setDescription(productDTO.getDescription());
-			
-			productRepo.save(product.get());
+			BeanUtils.copyProperties(productDTO, productNew);
+			productRepo.save(productNew);
 			} 
 		else {
 			throw new ProductNotFoundException("Product" + productDTO.getId()+" "+" Not found");
@@ -90,8 +86,7 @@ private final ProductRepository productRepo;
 	
 	
 	@Override
-	public void deleteById(Long id) {
-		
+	public void deleteById(Long id) {	
 		Optional<Product> product = productRepo.findById(id);
 		if (product.isPresent()) {
 		productRepo.deleteById(id);
@@ -99,6 +94,13 @@ private final ProductRepository productRepo;
 		throw new ProductNotFoundException("Product" +id+" "+" Not found");
 		}
 	
+	}
+
+
+	@Override
+	public void msj() {
+		System.out.println("hola");
+		
 	}
 	
 	

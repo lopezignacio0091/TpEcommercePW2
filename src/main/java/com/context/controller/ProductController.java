@@ -38,7 +38,7 @@ private final ProductService service;
 	}
 	
 	@GetMapping(value = "/products/{id}")
-	public ResponseEntity<ProductDTO> getIceCream(@PathVariable long id) {
+	public ResponseEntity<ProductDTO> getProductId(@PathVariable long id) {
 		return new ResponseEntity<>(service.getById(id), HttpStatus.OK);
 	}
 	
@@ -47,8 +47,6 @@ private final ProductService service;
 		Long id = service.post(productDTO);
 		return new ResponseEntity<>("Product successfully created. Id: " + id, HttpStatus.CREATED);
 	}
-	
-	
 	
 	@PutMapping(value = "/products/{id}")
 	public ResponseEntity<Object> putProduct(@PathVariable long id, @Valid @RequestBody ProductDTO productDTO) {
@@ -62,6 +60,12 @@ private final ProductService service;
 	public ResponseEntity<Object> deleteProduct(@PathVariable long id) {
 		service.deleteById(id);
 		return new ResponseEntity<>("Product deleted successfully: " + id, HttpStatus.OK);
+	}
+	
+	@PostMapping(path ="/batch/mensaje")
+	public ResponseEntity<Object> batchProcess(){
+		service.msj();
+		return new ResponseEntity<>(HttpStatus.OK);	
 	}
 
 }

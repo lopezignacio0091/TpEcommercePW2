@@ -1,28 +1,41 @@
 package com.context.model.dto;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
 import com.context.model.Product;
 
 public class ReportDTO {
 
 	private Long id ;
-	private String processedDateTime ;
+	private LocalDate processedDateTime ;
 	private int profit; 
 	private int totalCartsFailed ;
 	private int totalCartProcessed;
-    Product withoutStockProducts;
+	private Set<Product> withoutStockProducts;
     
     
     
+	public Set<Product> getWithoutStockProducts() {
+		return withoutStockProducts;
+	}
+	public void setWithoutStockProducts(Set<Product> withoutStockProducts) {
+		this.withoutStockProducts = withoutStockProducts;
+	}
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getProcessedDateTime() {
+	public LocalDate getProcessedDateTime() {
 		return processedDateTime;
 	}
-	public void setProcessedDateTime(String processedDateTime) {
+	public void setProcessedDateTime(LocalDate processedDateTime) {
 		this.processedDateTime = processedDateTime;
 	}
 	public int getProfit() {
@@ -43,13 +56,7 @@ public class ReportDTO {
 	public void setTotalCartProcessed(int totalCartProcessed) {
 		this.totalCartProcessed = totalCartProcessed;
 	}
-	public Product getWithoutStockProducts() {
-		return withoutStockProducts;
-	}
-	public void setWithoutStockProducts(Product withoutStockProducts) {
-		this.withoutStockProducts = withoutStockProducts;
-	}
 	
-    
+	 
     
 }

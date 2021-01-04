@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.context.model.CartProcessed;
+
 import com.context.model.dto.CartDTO;
 import com.context.model.dto.CartProductDTO;
 import com.context.model.dto.ProductDTO;
-
 
 @Service
 public interface CartService {
@@ -20,5 +19,5 @@ public interface CartService {
 	void deleteProductCart(Long id , Long idProduct);
 	String checkout(long id);
 	List<ProductDTO> getProductsFromCart(long id);
-	void batchProcessCart();
+	
 }

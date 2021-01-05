@@ -97,10 +97,10 @@ private final ProductRepository productRepo;
 	}
 
 
+
 	@Override
-	public void msj() {
-		System.out.println("hola");
-		
+	public void saveProduct(Product product) {
+		productRepo.save(product);
 	}
 	
 	

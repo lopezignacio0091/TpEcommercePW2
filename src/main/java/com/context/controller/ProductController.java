@@ -62,10 +62,6 @@ private final ProductService service;
 		return new ResponseEntity<>("Product deleted successfully: " + id, HttpStatus.OK);
 	}
 	
-	@PostMapping(path ="/batch/mensaje")
-	public ResponseEntity<Object> batchProcess(){
-		service.msj();
-		return new ResponseEntity<>(HttpStatus.OK);	
-	}
+	
 
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-
+import com.context.model.Cart;
 import com.context.model.dto.CartDTO;
 import com.context.model.dto.CartProductDTO;
 import com.context.model.dto.ProductDTO;
@@ -19,5 +19,7 @@ public interface CartService {
 	void deleteProductCart(Long id , Long idProduct);
 	String checkout(long id);
 	List<ProductDTO> getProductsFromCart(long id);
+	List<Cart> getCartsOrderByCheckoutDate();
+	void saveCart(Cart cart);
 	
 }

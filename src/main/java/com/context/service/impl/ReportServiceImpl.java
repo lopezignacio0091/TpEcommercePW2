@@ -3,6 +3,7 @@ package com.context.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import com.context.model.dto.ReportDTO;
 import com.context.repository.CartRepository;
 import com.context.repository.ProductRepository;
 import com.context.repository.ReportRepository;
+import com.context.service.CartService;
+import com.context.service.ProductService;
 import com.context.service.ReportService;
 import com.context.utils.Status;
 
@@ -26,32 +29,32 @@ import com.context.utils.Status;
 public class ReportServiceImpl implements ReportService{
 	
 	 private final ReportRepository repoReport;
-	 private final CartRepository cartReport; 
-	 private final ProductRepository productRepo;
-	 
+	 private final ProductService productService;
+	 private final CartService cartService;
 	
 	
-	  public ReportServiceImpl(ReportRepository repoReport , CartRepository cartRepo , ProductRepository productRepo) { 
+	  public ReportServiceImpl(ReportRepository repoReport  , ProductService productService,CartService cartService) { 
 		  super(); 
 		  this.repoReport = repoReport; 
-		  this.cartReport = cartRepo; 
-		  this.productRepo = productRepo;
-		  
+		  this.productService = productService;
+		  this.cartService = cartService;
 	  }
 	 
 	@Override
 	public void getProcessedCarts() {
-		
-		  List<Cart> cart = cartReport.findAll(); 
+			
+		  List<Cart> carts = cartService.getCartsOrderByCheckoutDate(); 
 		  Set<Product> productosSinStock = new HashSet<Product>();
 		  Report cartProcesados = new Report(); 
 		  cartProcesados.setProfit(BigDecimal.ZERO);
 		  cartProcesados.setTotalCartsFailed(0);
 		  cartProcesados.setTotalCartsFailed(0);
 		  
-		  for (Cart carts : cart) { 
-			  if (carts.getStatus() == Status.READY) {
-				  List<CartProduct> cartProducts = new ArrayList<CartProduct>(carts.getProducts()); 
+		  
+		  
+		  for (Cart cart : carts) { 
+			  if (cart.getStatus() == Status.READY) {
+				  List<CartProduct> cartProducts = new ArrayList<CartProduct>(cart.getProducts()); 
 				  boolean success = true;
 		  
 		  for (CartProduct cartP : cartProducts) { 
@@ -68,14 +71,14 @@ public class ReportServiceImpl implements ReportService{
 		  if (success) { 
 			for (CartProduct cartP : cartProducts) {	  
 		  cartP.getProduct().setStock(cartP.getProduct().getStock()-cartP.getQuantity());
-		  productRepo.save(cartP.getProduct()); 
+		  productService.saveProduct(cartP.getProduct()); 
 		  }
-		  cartProcesados.setProfit(cartProcesados.getProfit().add(carts.getTotal()));
-		  carts.setStatus(Status.PROCESSED);
+		  cartProcesados.setProfit(cartProcesados.getProfit().add(cart.getTotal()));
+		  cart.setStatus(Status.PROCESSED);
 		  } 
 		  else 
 		  { 
-			  carts.setStatus(Status.FAILED);
+			  cart.setStatus(Status.FAILED);
 			  cartProcesados.setTotalCartsFailed(cartProcesados.getTotalCartsFailed() + 1);
 		  }
 		  
@@ -83,9 +86,9 @@ public class ReportServiceImpl implements ReportService{
 //		  cartProcesados.setWithoutStockProducts(productosSinStock);
 		  cartProcesados.setWithoutStockProducts(productosSinStock);
 		  cartProcesados.setProcessedDateTime(LocalDate.now());
-		  cartReport.save(carts);
+		  cartService.saveCart(cart);
 		  repoReport.save(cartProcesados);
-		  System.out.println(carts.getId() +" Esta en estado " + carts.getStatus()); 
+		  System.out.println(cart.getId() +" Esta en estado " + cart.getStatus()); 
 		  } 
 		  
 		}

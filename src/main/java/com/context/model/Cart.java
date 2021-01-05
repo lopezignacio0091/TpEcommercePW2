@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.context.utils.Status;
 
 @Entity
-public class Cart {
+public class Cart implements  Comparable<Cart>{
 
 	private @Id @GeneratedValue Long id;
 	private String fullName; 
@@ -101,4 +101,13 @@ public class Cart {
 		this.status = status;
 	}
 
-}
+	@Override
+	public int compareTo(Cart arg0) {
+		 if (getCreationDate() == null || arg0.getCreationDate() == null) {
+		      return 0;
+		    }
+		    return getCreationDate().compareTo(arg0.getCreationDate());
+		  }
+	}
+
+

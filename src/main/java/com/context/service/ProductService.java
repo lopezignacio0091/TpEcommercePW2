@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.context.model.Product;
 import com.context.model.dto.ProductDTO;
 
 @Service
@@ -14,6 +15,6 @@ public interface ProductService {
 	Long post(ProductDTO product);
 	Long put (ProductDTO product);
 	void deleteById(Long id);
-	void msj();
+	void saveProduct (Product product);
 
 }

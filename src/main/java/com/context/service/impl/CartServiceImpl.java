@@ -21,11 +21,15 @@ import com.context.service.business.exception.ProductNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -224,5 +228,20 @@ public class CartServiceImpl implements CartService {
 			throw new CartServiceException("Carrito inexistente");
 		}
 	}
+
+	@Override
+	public List<Cart> getCartsOrderByCheckoutDate() {
+		List <Cart> carrito = cartRepo.findAll();
+		 Collections.sort(carrito);
+		return carrito;
+	}
+
+	@Override
+	public void saveCart(Cart cart) {
+		cartRepo.save(cart);	
+	}
+	
+	
+	
 
 }

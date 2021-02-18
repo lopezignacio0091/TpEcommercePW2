@@ -9,7 +9,6 @@ public class ProductDTO {
 	private Long id;
 	private String description;
 	private BigDecimal unitPrice;
-	
 	private Integer stock;
 	
 	public ProductDTO() {

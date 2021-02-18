@@ -27,7 +27,7 @@ public class ReportController {
 	@PostMapping(path ="/batch/processCarts")
 	public ResponseEntity<Object> batchProcess(){
 		
-		service.getProcessedCarts();
+		service.postProcessedCarts();
 		return new ResponseEntity<>(HttpStatus.OK);	
 	}
 	

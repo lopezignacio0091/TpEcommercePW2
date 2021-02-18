@@ -5,6 +5,7 @@ import com.context.model.CartProduct;
 import com.context.model.CartProductKey;
 import com.context.model.Product;
 import com.context.utils.*;
+import com.context.service.business.exception.*;
 import com.context.model.dto.CartDTO;
 import com.context.model.dto.CartProductDTO;
 import com.context.model.dto.ProductDTO;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.Convert;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -51,62 +54,66 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public CartDTO getById(Long id) {
 		CartDTO cartDTO = new CartDTO();
-
 		Optional<Cart> cart = cartRepo.findById(id);
-
 		if (cart.isPresent()) {
 			BeanUtils.copyProperties(cart.get(), cartDTO);
 			return cartDTO;
 		}
-		throw new CartNotFoundException("Invalid cart");
+		throw new CartNotPresentException();
 	}
 
 	@Override
 	public Long post(CartDTO cartDTO) {
+		
+		if (cartDTO.getfullName() == null || cartDTO.getfullName()== ""){
+			throw new CartFullNameRequiredException();
+		}
+		if (cartDTO.getEmail() == null || cartDTO.getEmail() == "" ) {
+			throw new CartEmailRequiredException();
+		}
 
-		Boolean camposVacios = (cartDTO.getEmail() == null || cartDTO.getEmail() == "" || cartDTO.getfullName() == null
-				|| cartDTO.getfullName() == "") ? true : false;
-
-		if (camposVacios) {
-			return null;
-		} else {
-
-			Optional<Cart> carrito = cartRepo.findByEmail(cartDTO.getEmail());
-			if (carrito.isPresent() == false) {
-
+		Optional<Cart> carrito = cartRepo.findByEmail(cartDTO.getEmail());
+		if (carrito.isPresent()) {
+				throw new CartDuplicatedException("Duplicated cart");
+			}
 				Cart cart = new Cart();
-				cartDTO.setCreationDate(LocalDate.now());
-				cartDTO.setStatus(Status.NEW);
-				BigDecimal totalNew = BigDecimal.valueOf(0);
-				cartDTO.setTotal(totalNew);
 				BeanUtils.copyProperties(cartDTO, cart);
 				cart = cartRepo.save(cart);
 				return cart.getId();
-			} else {
-				throw new CartDuplicatedException("Duplicated cart");
-			}
+
 		}
-	}
+	
 
 	@Override
 	public Long postId(Long id, CartProductDTO cartproductDTO) {
-
+		
+		
+		if(id == 0 || id ==null ) {
+			throw new CartIdRequiredException();
+		}
 		CartProduct producNew = new CartProduct();
 		Optional<Cart> cart = cartRepo.findById(id);
 		Optional<Product> product = productRepo.findById(cartproductDTO.getId());
+		
+		if (cartproductDTO.getQuantity() == null) {
+			throw new ProductQuantityRequiredException();
+		}
+		if (cartproductDTO.getQuantity() <= 0) {
+			throw new ProductQuantityInvalidException();
+		}		
 
-		if (product.isPresent()) {
+		if (!product.isPresent()) {throw new ProductNotPresentException();}
+		if (!cart.isPresent()) {throw new CartNotPresentException();}
 
-			if (cart.isPresent()) {
+		if (cartproductDTO.getQuantity() > product.get().getStock()){throw new ProductStockInsufficientException();} 
 
-				if (cartproductDTO.getQuantity() > product.get().getStock()) {
-					throw new CartInsufficientException("Insufficient stock");
-				} else {
-
-					CartProductKey key = new CartProductKey(cart.get().getId(), product.get().getId());
-					Optional<CartProduct> cartProductExiste = cartProductRepo.findById(key);
+		CartProductKey key = new CartProductKey(cart.get().getId(), product.get().getId());
+		Optional<CartProduct> cartProductExiste = cartProductRepo.findById(key);
 					
-					if (cartProductExiste.isPresent() == false) {
+		if (cartProductExiste.isPresent()) {
+			cartProductExiste.get().setQuantity(cartproductDTO.getQuantity() + cartProductExiste.get().getQuantity());
+			return cartProductExiste.get().getCart().getId();
+		}
 
 						producNew.setId(key);
 						producNew.setQuantity(cartproductDTO.getQuantity());
@@ -123,57 +130,35 @@ public class CartServiceImpl implements CartService {
 						cartRepo.save(cart.get());
 						
 						return cart.get().getId();
-					} else {
-						cartProductExiste.get().setQuantity(cartproductDTO.getQuantity() + cartProductExiste.get().getQuantity());
-						
-						return cartProductExiste.get().getCart().getId();
-					}
-
-				}
-			} else {
-				throw new CartNotFoundException("Invalid cart");
-			}
-		} else {
-			throw new CartNotFoundException("Invalid product");
-		}
-	}
+} 
+			
+				
 
 	@Override
 	public void deleteProductCart(Long id, Long idProduct) {
 
 		Optional<Cart> cart = cartRepo.findById(id);
 		Optional<Product> product = productRepo.findById(idProduct);
-		Boolean cartValue = false;
-		Boolean productValue = false;
-
-		if (product.isPresent()) {
-			productValue = true;
-
-		} else {
-			throw new ProductNotFoundException("Invalid product Not found");
+		
+		if (!product.isPresent()) {	
+			throw new ProductNotPresentException();
 		}
-		if (cart.isPresent()) {
-			cartValue = true;
-		} else {
-			throw new CartNotFoundException("Invalid Cart  Not found");
+		if (!cart.isPresent()) {
+		throw new CartNotPresentException();	
 		}
-		if (productValue == true && cartValue == true) {
+	
 			CartProductKey key = new CartProductKey(cart.get().getId(), product.get().getId());
 			Optional<CartProduct> cartProduct = cartProductRepo.findById(key);
-
 			cart.get().setTotal(cart.get().getTotal().subtract(
-			cartProduct.get().getPrecio().multiply(BigDecimal.valueOf(cartProduct.get().getQuantity()))));
-			
+			cartProduct.get().getPrecio().multiply(BigDecimal.valueOf(cartProduct.get().getQuantity()))));	
 			cartProductRepo.deleteById(key);
 		}
-	}
 
 	@Override
 	public List<CartDTO> getCarts() {
 
 		List<Cart> cart = cartRepo.findAll();
 		List<CartDTO> dtos = new ArrayList<>(cart.size());
-
 		for (int i = 0; i < cart.size(); i++) {
 			CartDTO cartDTO = new CartDTO();
 			BeanUtils.copyProperties(cart.get(i), cartDTO);
@@ -187,24 +172,18 @@ public class CartServiceImpl implements CartService {
 	public String checkout(long id) {
 
 		Optional<Cart> cart = cartRepo.findById(id);
-
-		if (cart.isPresent()) {
-			if (cart.get().getStatus().equals(Status.NEW)) {
-
-				Date currentDate = new Date();
-				cart.get().setStatus(Status.READY);
-
-				cart.get().setCheckDate(currentDate);
-				cartRepo.save(cart.get());
-
-				return "Checkout realizado";
-			} else {
-				throw new CartNotFoundException("Invalid cart status");
-			}
-		} else {
-			throw new CartNotFoundException("Invalid Cart");
+		if (!cart.isPresent()) {
+			throw new CartNotPresentException();
 		}
-
+		if (!cart.get().getStatus().equals(Status.NEW)) {
+		throw new CartProcessingNotAllowDeletionException();	
+		}
+		
+		Date currentDate = new Date();
+		cart.get().setStatus(Status.READY);
+		cart.get().setCheckDate(currentDate);
+		cartRepo.save(cart.get());
+		return "Checkout realizado";
 	}
 
 	@Override
@@ -212,21 +191,18 @@ public class CartServiceImpl implements CartService {
 
 		Optional<Cart> carrito = cartRepo.findById(id);
 
-		if (carrito.isPresent()) {
-			List<CartProduct> products = new ArrayList<CartProduct>(carrito.get().getProducts());
-			List<ProductDTO> dtos = new ArrayList<>(products.size());
-
-			for (int i = 0; i < products.size(); i++) {
-				ProductDTO productDTO = new ProductDTO();
-				BeanUtils.copyProperties(products.get(i).getProduct(), productDTO);
-
-				productDTO.setStock(products.get(i).getQuantity());
-				dtos.add(productDTO);
-			}
-			return dtos;
-		} else {
-			throw new CartServiceException("Carrito inexistente");
+		if (!carrito.isPresent()) {
+			throw new CartNotPresentException();
 		}
+		List<CartProduct> products = new ArrayList<CartProduct>(carrito.get().getProducts());
+		List<ProductDTO> dtos = new ArrayList<>(products.size());
+		for (int i = 0; i < products.size(); i++) {
+			ProductDTO productDTO = new ProductDTO();
+			BeanUtils.copyProperties(products.get(i).getProduct(), productDTO);
+			productDTO.setStock(products.get(i).getQuantity());
+			dtos.add(productDTO);
+		}
+			return dtos;
 	}
 
 	@Override

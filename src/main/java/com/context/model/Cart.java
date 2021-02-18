@@ -25,12 +25,12 @@ public class Cart implements  Comparable<Cart>{
 	private @Id @GeneratedValue Long id;
 	private String fullName; 
 	private String email ;
-	private LocalDate creationDate ;
+	private LocalDate creationDate = LocalDate.now();
 	@OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private Set<CartProduct> products = new HashSet<CartProduct>();
-	private BigDecimal total ;
-	private Status status; 
+	private BigDecimal total = BigDecimal.valueOf(0);
+	private Status status = Status.NEW; 
 	private Date checkDate ;
 
 	

@@ -9,6 +9,6 @@ import com.context.model.dto.ReportDTO;
 @Service
 public interface ReportService {
 
-	 void getProcessedCarts();
+	 void postProcessedCarts();
 	 void msj();
 }

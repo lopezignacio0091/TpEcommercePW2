@@ -1,6 +1,7 @@
 package com.context.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -49,15 +50,14 @@ private final ProductService service;
 	}
 	
 	@PutMapping(value = "/products/{id}")
-	public ResponseEntity<Object> putProduct(@PathVariable long id, @Valid @RequestBody ProductDTO productDTO) {
-		productDTO.setId(id);
-		service.put(productDTO);
+	public ResponseEntity<Object> putProduct(@PathVariable  Optional<Long> id, @Valid @RequestBody ProductDTO productDTO) {
+		service.put(id,productDTO);
 		return new ResponseEntity<>("Product successfully updated. Id: " + id, HttpStatus.OK);
 	}
 	
 	
 	@DeleteMapping(value = "/products/{id}")
-	public ResponseEntity<Object> deleteProduct(@PathVariable long id) {
+	public ResponseEntity<Object> deleteProduct(@PathVariable  Optional<Long> id) {
 		service.deleteById(id);
 		return new ResponseEntity<>("Product deleted successfully: " + id, HttpStatus.OK);
 	}

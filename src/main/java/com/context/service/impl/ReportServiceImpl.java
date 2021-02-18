@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class ReportServiceImpl implements ReportService{
 	  }
 	 
 	@Override
-	public void getProcessedCarts() {
+	public void postProcessedCarts() {
 			
 		  List<Cart> carts = cartService.getCartsOrderByCheckoutDate(); 
 		  Set<Product> productosSinStock = new HashSet<Product>();
@@ -50,8 +51,7 @@ public class ReportServiceImpl implements ReportService{
 		  cartProcesados.setTotalCartsFailed(0);
 		  cartProcesados.setTotalCartsFailed(0);
 		  
-		  
-		  
+		  //carts.parallelStream().forEachOrdered(c->c.getCheckDate());
 		  for (Cart cart : carts) { 
 			  if (cart.getStatus() == Status.READY) {
 				  List<CartProduct> cartProducts = new ArrayList<CartProduct>(cart.getProducts()); 
@@ -68,6 +68,7 @@ public class ReportServiceImpl implements ReportService{
 		  
 		  }
 		  
+		  
 		  if (success) { 
 			for (CartProduct cartP : cartProducts) {	  
 		  cartP.getProduct().setStock(cartP.getProduct().getStock()-cartP.getQuantity());
@@ -83,7 +84,6 @@ public class ReportServiceImpl implements ReportService{
 		  }
 		  
 		  cartProcesados.setTotalCartsProcessed(cartProcesados.getTotalCartsProcessed()+1); 
-//		  cartProcesados.setWithoutStockProducts(productosSinStock);
 		  cartProcesados.setWithoutStockProducts(productosSinStock);
 		  cartProcesados.setProcessedDateTime(LocalDate.now());
 		  cartService.saveCart(cart);
@@ -96,7 +96,7 @@ public class ReportServiceImpl implements ReportService{
 	}
 
 
-
+	 
 
 
 	@Override

@@ -16,16 +16,14 @@ private static final Logger logger = LoggerFactory.getLogger(ApiRestHeladeriaApp
     public ResponseEntity<String> handleRunTimeException(RuntimeException e) {
         return error(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
-    @ExceptionHandler({ProductNotFoundException.class})
-    public ResponseEntity<String> handleNotFoundException(ProductNotFoundException e) {
-        return error(HttpStatus.NOT_FOUND, e);
-    }
     @ExceptionHandler({ProductServiceException.class})
     public ResponseEntity<String> handleDogsServiceException(ProductServiceException e){
-        return error(HttpStatus.INTERNAL_SERVER_ERROR, e);
+        return error(HttpStatus.NOT_FOUND, e);
     }
     private ResponseEntity<String> error(HttpStatus status, Exception e) {
     	logger.error("Exception : ", e);
         return ResponseEntity.status(status).body(e.getMessage());
     }
+    
+    
 }

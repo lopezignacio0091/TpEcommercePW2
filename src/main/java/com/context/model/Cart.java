@@ -25,11 +25,11 @@ public class Cart implements  Comparable<Cart>{
 	private @Id @GeneratedValue Long id;
 	private String fullName; 
 	private String email ;
-	private LocalDate creationDate = LocalDate.now();
+	private Date creationDate = new Date (System.currentTimeMillis());
 	@OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private Set<CartProduct> products = new HashSet<CartProduct>();
-	private BigDecimal total = BigDecimal.valueOf(0);
+	private BigDecimal total = new BigDecimal("0");
 	private Status status = Status.NEW; 
 	private Date checkDate ;
 
@@ -71,10 +71,10 @@ public class Cart implements  Comparable<Cart>{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public LocalDate getCreationDate() {
+	public Date getCreationDate() {
 		return creationDate;
 	}
-	public void setCreationDate(LocalDate creationDate) {
+	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
 	}
 	
@@ -103,11 +103,9 @@ public class Cart implements  Comparable<Cart>{
 
 	@Override
 	public int compareTo(Cart arg0) {
-		 if (getCreationDate() == null || arg0.getCreationDate() == null) {
+		 if (getCheckDate() == null || arg0.getCheckDate() == null) {
 		      return 0;
 		    }
-		    return getCreationDate().compareTo(arg0.getCreationDate());
+		    return getCheckDate().compareTo(arg0.getCheckDate());
 		  }
 	}
-
-

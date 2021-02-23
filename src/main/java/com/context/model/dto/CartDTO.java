@@ -16,10 +16,10 @@ public class CartDTO {
 	private Long id;
 	private String fullName; 
 	private String email ;
-	private LocalDate creationDate;
+	private Date creationDate = new Date (System.currentTimeMillis());
 	private Set<CartProduct> products = new HashSet<CartProduct>();
-	private BigDecimal total ;
-	private Status status; 
+	private BigDecimal total =new BigDecimal("0");
+	private Status status = Status.NEW;
 	private Date checkDate ;
 	
 	
@@ -77,13 +77,13 @@ public class CartDTO {
 
 
 
-	public LocalDate getCreationDate() {
+	public Date getCreationDate() {
 		return creationDate;
 	}
 
 
 
-	public void setCreationDate(LocalDate creationDate) {
+	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
 	}
 

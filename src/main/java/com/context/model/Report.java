@@ -3,6 +3,7 @@ package com.context.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,7 +17,7 @@ public class Report {
 	public int getTotalCartsProcessed() {
 		return totalCartsProcessed;
 	}
-	public void setTotalCartsProcessed(int totalCartsProcessed) {
+	public void cart(int totalCartsProcessed) {
 		this.totalCartsProcessed = totalCartsProcessed;
 	}
 	public int getTotalCartsFailed() {
@@ -38,27 +39,31 @@ public class Report {
 		this.withoutStockProducts = products;
 	}
 	
-	private @Id @GeneratedValue Long id;
-	private int totalCartsProcessed;
+	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	private int totalCartsFailed;
-	private BigDecimal profit;
+	private @Id @GeneratedValue Long id;
+	private int totalCartsProcessed=0;
+	private int totalCartsFailed = 0 ;
+	private BigDecimal profit = BigDecimal.ZERO;
 	@OneToMany(fetch = FetchType.EAGER)
 	private Set<Product> withoutStockProducts;
-	private LocalDate ProcessedDateTime;
+	private Date ProcessedDateTime =  new Date (System.currentTimeMillis());
 	
-	public void setProcessedDateTime(LocalDate now) {
+	public void setProcessedDateTime(Date now) {
 		// TODO Auto-generated method stub
 		
 	}
-	public LocalDate getProcessedDateTime() {
+	public Date getProcessedDateTime() {
 		return ProcessedDateTime;
+	}
+	public void setTotalCartsProcessed(int i) {
+		this.totalCartsProcessed = i;
+		
 	}
 }
 

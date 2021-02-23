@@ -18,10 +18,6 @@ private static final Logger logger = LoggerFactory.getLogger(ApiRestHeladeriaApp
     public ResponseEntity<String> handleRunTimeException(RuntimeException e) {
         return error(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
-    @ExceptionHandler({CartNotFoundException.class})
-    public ResponseEntity<String> handleNotFoundException(CartNotFoundException e) {
-        return error(HttpStatus.NOT_FOUND, e);
-    }
     @ExceptionHandler({CartDuplicatedException.class})
     public ResponseEntity<String> handleDuplicatedException(CartDuplicatedException e) {
         return error(HttpStatus.CONFLICT, e);
@@ -39,4 +35,6 @@ private static final Logger logger = LoggerFactory.getLogger(ApiRestHeladeriaApp
     	logger.error("Exception : ", e);
         return ResponseEntity.status(status).body(e.getMessage());
     }
+    
+    
 }

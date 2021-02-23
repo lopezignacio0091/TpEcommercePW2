@@ -44,7 +44,7 @@ private final ProductRepository productRepo;
 		Optional<Product> product = productRepo.findById(id);
 		ProductDTO dto = new ProductDTO();	
 		if (!product.isPresent()) {
-			throw new ProductNotFoundException("Product " + id + " not found");	
+			throw new ProductNotPresentException();	
 		}
 		BeanUtils.copyProperties(product.get(), dto);
 		
@@ -83,7 +83,7 @@ private final ProductRepository productRepo;
 		productDTO.setId(id.get());
 		Optional<Product> _product  = this.productRepo.findById(productDTO.getId());
 		if (!_product.isPresent()) {
-			throw new ProductNotFoundException("Product " + id + " not found");
+			throw new ProductNotPresentException();
 		}
 		if (productDTO.getId() == null) {
 			throw new ProductIdRequiredException();
@@ -111,11 +111,11 @@ private final ProductRepository productRepo;
 	public void deleteById(Optional<Long> id) {
 		
 		if (!id.isPresent()) {
-			throw new ProductNotFoundException("Product" +id.get()+" "+" Not found");
+			throw new ProductNotPresentException();
 		}
 		Optional<Product> _product  = this.productRepo.findById(id.get());
 		if (!_product.isPresent()) {
-			throw new ProductNotFoundException("Product" +id.get()+" "+" Not found");
+			throw new ProductNotPresentException();
 		}
 		
 		productRepo.deleteById(id.get());

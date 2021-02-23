@@ -15,9 +15,7 @@ import com.context.repository.ProductRepository;
 import com.context.service.CartService;
 import com.context.service.business.exception.CartDuplicatedException;
 import com.context.service.business.exception.CartInsufficientException;
-import com.context.service.business.exception.CartNotFoundException;
-import com.context.service.business.exception.CartServiceException;
-import com.context.service.business.exception.ProductNotFoundException;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,7 +72,7 @@ public class CartServiceImpl implements CartService {
 
 		Optional<Cart> carrito = cartRepo.findByEmail(cartDTO.getEmail());
 		if (carrito.isPresent()) {
-				throw new CartDuplicatedException("Duplicated cart");
+				throw new CartDuplicatedException();
 			}
 				Cart cart = new Cart();
 				BeanUtils.copyProperties(cartDTO, cart);
@@ -118,14 +116,12 @@ public class CartServiceImpl implements CartService {
 						producNew.setId(key);
 						producNew.setQuantity(cartproductDTO.getQuantity());
 						producNew.setPrecio(product.get().getUnitPrice());
-
-						cart.get().setCreationDate(LocalDate.now());
-
-						BigDecimal totalNew = (product.get().getUnitPrice().multiply(BigDecimal.valueOf(cartproductDTO.getQuantity())));
-						cart.get().setTotal((cart.get().getTotal().add(totalNew)));
+						BigDecimal totalNew = (product.get().getUnitPrice()
+								.multiply(BigDecimal.valueOf(cartproductDTO.getQuantity())));
+						cart.get().setTotal(cart.get().getTotal().add(totalNew));
 						cart.get().setStatus(Status.NEW);
 						
-						product.get().setStock(product.get().getStock() - cartproductDTO.getQuantity());
+						//product.get().setStock(product.get().getStock() - cartproductDTO.getQuantity());
 						cartProductRepo.save(producNew);
 						cartRepo.save(cart.get());
 						
@@ -208,7 +204,8 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public List<Cart> getCartsOrderByCheckoutDate() {
 		List <Cart> carrito = cartRepo.findAll();
-		 Collections.sort(carrito);
+		carrito.parallelStream().filter(x->x.getStatus()==Status.READY);
+		Collections.sort(carrito);
 		return carrito;
 	}
 

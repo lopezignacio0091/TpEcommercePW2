@@ -10,5 +10,4 @@ import com.context.model.dto.ReportDTO;
 public interface ReportService {
 
 	 void postProcessedCarts();
-	 void msj();
 }

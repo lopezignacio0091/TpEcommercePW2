@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.jca.cci.core.support.CciDaoSupport;
 import org.springframework.stereotype.Service;
 
 import com.context.model.Cart;
@@ -32,6 +33,8 @@ public class ReportServiceImpl implements ReportService{
 	 private final ReportRepository repoReport;
 	 private final ProductService productService;
 	 private final CartService cartService;
+	 public Boolean productoProcces = true ;
+	
 	
 	
 	  public ReportServiceImpl(ReportRepository repoReport  , ProductService productService,CartService cartService) { 
@@ -39,70 +42,53 @@ public class ReportServiceImpl implements ReportService{
 		  this.repoReport = repoReport; 
 		  this.productService = productService;
 		  this.cartService = cartService;
+		 
 	  }
 	 
+	
+
 	@Override
-	public void postProcessedCarts() {
-			
-		  List<Cart> carts = cartService.getCartsOrderByCheckoutDate(); 
-		  Set<Product> productosSinStock = new HashSet<Product>();
-		  Report cartProcesados = new Report(); 
-		  cartProcesados.setProfit(BigDecimal.ZERO);
-		  cartProcesados.setTotalCartsFailed(0);
-		  cartProcesados.setTotalCartsFailed(0);
-		  
-		  //carts.parallelStream().forEachOrdered(c->c.getCheckDate());
-		  for (Cart cart : carts) { 
-			  if (cart.getStatus() == Status.READY) {
-				  List<CartProduct> cartProducts = new ArrayList<CartProduct>(cart.getProducts()); 
-				  boolean success = true;
-		  
-		  for (CartProduct cartP : cartProducts) { 
-			  if (cartP.getQuantity() > cartP.getProduct().getStock())
-			  { 
+	public void postProcessedCarts() {		
+	List<Cart> carts = cartService.getCartsOrderByCheckoutDate();
+	Collections.reverse(carts);
+	carts.parallelStream().forEach(x->{
+		proccesProductCart(x);
+	});;
+	
+}
+	
+	 public   void proccesProductCart(Cart cart) {
+		 Set<Product> productosSinStock = new HashSet<Product>();
+		 Report cartProcesados = new Report();
+		 boolean success = true;
+		 for(CartProduct cartP:cart.getProducts()) {	
+			  if(cartP.getQuantity()>cartP.getProduct().getStock()) {
 				  success = false;
-			   } 
+			  }
 			  if (cartP.getProduct().getStock() == 0) {
 				  productosSinStock.add(cartP.getProduct()); 
+			  }
+		 }	  
+		 if(success) {
+			 	cart.getProducts().parallelStream().forEach(x->{discountingStock(x);});
+				cartProcesados.setProfit(cartProcesados.getProfit().add(cart.getTotal()));
+				cart.setStatus(Status.PROCESSED);
 			}
-		  
-		  }
-		  
-		  
-		  if (success) { 
-			for (CartProduct cartP : cartProducts) {	  
-		  cartP.getProduct().setStock(cartP.getProduct().getStock()-cartP.getQuantity());
-		  productService.saveProduct(cartP.getProduct()); 
-		  }
-		  cartProcesados.setProfit(cartProcesados.getProfit().add(cart.getTotal()));
-		  cart.setStatus(Status.PROCESSED);
-		  } 
-		  else 
-		  { 
-			  cart.setStatus(Status.FAILED);
-			  cartProcesados.setTotalCartsFailed(cartProcesados.getTotalCartsFailed() + 1);
-		  }
-		  
-		  cartProcesados.setTotalCartsProcessed(cartProcesados.getTotalCartsProcessed()+1); 
-		  cartProcesados.setWithoutStockProducts(productosSinStock);
-		  cartProcesados.setProcessedDateTime(LocalDate.now());
-		  cartService.saveCart(cart);
-		  repoReport.save(cartProcesados);
-		  System.out.println(cart.getId() +" Esta en estado " + cart.getStatus()); 
-		  } 
-		  
-		}
-		 
-	}
-
-
+			if(!success) {
+				cart.setStatus(Status.FAILED);
+				cartProcesados.setTotalCartsFailed(cartProcesados.getTotalCartsFailed() + 1);
+			}
+		 cartProcesados.setTotalCartsProcessed(cartProcesados.getTotalCartsProcessed() + 1);
+		 cartService.saveCart(cart);
+		 System.out.println(cart.getId() + " Esta en estado " + cart.getStatus()); 
+		 cartProcesados.setWithoutStockProducts(productosSinStock);
+		 repoReport.save(cartProcesados);
+	 }
 	 
 
 
-	@Override
-	public void msj() {
-		// TODO Auto-generated method stub
-		System.out.println("hola");
-	}
-	
-}
+ public void discountingStock(CartProduct cartP) { 
+	 cartP.getProduct().setStock(cartP.getProduct().getStock() - cartP.getQuantity());
+	 productService.saveProduct(cartP.getProduct());
+ 	}
+ }

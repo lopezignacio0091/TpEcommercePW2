@@ -1,9 +1,12 @@
 package com.context.service.impl;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,7 @@ import com.context.model.Cart;
 import com.context.model.CartProduct;
 import com.context.model.Product;
 import com.context.model.Report;
+import com.context.model.dto.ProductDTO;
 import com.context.model.dto.ReportDTO;
 import com.context.repository.CartRepository;
 import com.context.repository.ProductRepository;
@@ -25,6 +29,7 @@ import com.context.repository.ReportRepository;
 import com.context.service.CartService;
 import com.context.service.ProductService;
 import com.context.service.ReportService;
+
 import com.context.utils.Status;
 
 @Service
@@ -68,6 +73,7 @@ public class ReportServiceImpl implements ReportService{
 			  if (cartP.getProduct().getStock() == 0) {
 				  productosSinStock.add(cartP.getProduct()); 
 			  }
+			  
 		 }	  
 		 if(success) {
 			 	cart.getProducts().parallelStream().forEach(x->{discountingStock(x);});
@@ -91,4 +97,31 @@ public class ReportServiceImpl implements ReportService{
 	 cartP.getProduct().setStock(cartP.getProduct().getStock() - cartP.getQuantity());
 	 productService.saveProduct(cartP.getProduct());
  	}
- }
+ 
+
+
+public List<ReportDTO>getReports(){
+	List<Report> reports = repoReport.findAll();
+	List<ReportDTO> dtos = new ArrayList<>(reports.size());
+	for (int i = 0; i < reports.size(); i++) {
+		ReportDTO reportDTO = new ReportDTO();
+		BeanUtils.copyProperties(reports.get(i), reportDTO);
+		dtos.add(reportDTO);
+	}		
+	return dtos;
+	}
+
+public List<ReportDTO>getReportsDate(Date desde , Date hasta){
+	List<Report> reports = repoReport.findAll();
+	List<ReportDTO> dtos = new ArrayList<>(reports.size());
+	for (int i = 0; i < reports.size(); i++) {
+		if(reports.get(i).getProcessedDateTime().after(desde) && reports.get(i).getProcessedDateTime().before(hasta)) {
+		 ReportDTO reportDTO = new ReportDTO();
+		 BeanUtils.copyProperties(reports.get(i), reportDTO);
+		 dtos.add(reportDTO);
+		}
+		
+	}		
+	return dtos;
+	}
+}

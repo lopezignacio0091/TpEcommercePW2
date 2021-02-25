@@ -1,6 +1,7 @@
 package com.context.model.dto;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ import com.context.model.Product;
 public class ReportDTO {
 
 	private Long id ;
-	private LocalDate processedDateTime ;
+	private Date processedDateTime ;
 	private int profit; 
 	private int totalCartsFailed ;
 	private int totalCartProcessed;
@@ -32,10 +33,10 @@ public class ReportDTO {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public LocalDate getProcessedDateTime() {
+	public Date getProcessedDateTime() {
 		return processedDateTime;
 	}
-	public void setProcessedDateTime(LocalDate processedDateTime) {
+	public void setProcessedDateTime(Date processedDateTime) {
 		this.processedDateTime = processedDateTime;
 	}
 	public int getProfit() {

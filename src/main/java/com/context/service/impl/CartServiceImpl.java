@@ -33,7 +33,9 @@ import java.util.stream.Collectors;
 import javax.persistence.Convert;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -100,8 +102,12 @@ public class CartServiceImpl implements CartService {
 			throw new ProductQuantityInvalidException();
 		}		
 
-		if (!product.isPresent()) {throw new ProductNotPresentException();}
-		if (!cart.isPresent()) {throw new CartNotPresentException();}
+		if(!product.isPresent()) {
+			throw new ProductNotPresentException();
+		}
+		if (!cart.isPresent()) {
+			throw new CartNotPresentException();	
+		}
 
 		if (cartproductDTO.getQuantity() > product.get().getStock()){throw new ProductStockInsufficientException();} 
 

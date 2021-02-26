@@ -10,7 +10,7 @@ import com.context.model.dto.ReportDTO;
 @Service
 public interface ReportService {
 
-	 void postProcessedCarts();
+	 List<ReportDTO> postProcessedCarts();
 	 List<ReportDTO> getReports();
 	 List<ReportDTO> getReportsDate(Date desde , Date hasta);
 }

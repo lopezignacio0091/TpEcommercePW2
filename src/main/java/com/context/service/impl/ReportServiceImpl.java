@@ -53,16 +53,22 @@ public class ReportServiceImpl implements ReportService{
 	
 
 	@Override
-	public void postProcessedCarts() {		
+	public List<ReportDTO> postProcessedCarts() {		
 	List<Cart> carts = cartService.getCartsOrderByCheckoutDate();
 	Collections.reverse(carts);
+	List <ReportDTO> listReportDTO = new ArrayList<ReportDTO>();
 	carts.parallelStream().forEach(x->{
-		proccesProductCart(x);
+		ReportDTO reportDTO = new ReportDTO();
+		Report report = proccesProductCart(x);
+		BeanUtils.copyProperties(report, reportDTO);
+		listReportDTO.add(reportDTO);
 	});;
 	
+	
+	return listReportDTO;
 }
 	
-	 public   void proccesProductCart(Cart cart) {
+	 public   Report proccesProductCart(Cart cart) {
 		 Set<Product> productosSinStock = new HashSet<Product>();
 		 Report cartProcesados = new Report();
 		 boolean success = true;
@@ -89,6 +95,8 @@ public class ReportServiceImpl implements ReportService{
 		 System.out.println(cart.getId() + " Esta en estado " + cart.getStatus()); 
 		 cartProcesados.setWithoutStockProducts(productosSinStock);
 		 repoReport.save(cartProcesados);
+		 
+		 return cartProcesados;
 	 }
 	 
 
@@ -119,9 +127,8 @@ public List<ReportDTO>getReportsDate(Date desde , Date hasta){
 		 ReportDTO reportDTO = new ReportDTO();
 		 BeanUtils.copyProperties(reports.get(i), reportDTO);
 		 dtos.add(reportDTO);
-		}
-		
+		}	
 	}		
-	return dtos;
+		return dtos;
 	}
 }

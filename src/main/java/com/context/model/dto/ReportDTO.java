@@ -1,5 +1,6 @@
 package com.context.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,12 +15,10 @@ public class ReportDTO {
 
 	private Long id ;
 	private Date processedDateTime ;
-	private int profit; 
-	private int totalCartsFailed ;
-	private int totalCartProcessed;
+	private BigDecimal profit; 
+	private int totalCartsFailed;
+	private int totalCartsProcessed;
 	private Set<Product> withoutStockProducts;
-    
-    
     
 	public Set<Product> getWithoutStockProducts() {
 		return withoutStockProducts;
@@ -39,10 +38,10 @@ public class ReportDTO {
 	public void setProcessedDateTime(Date processedDateTime) {
 		this.processedDateTime = processedDateTime;
 	}
-	public int getProfit() {
+	public BigDecimal getProfit() {
 		return profit;
 	}
-	public void setProfit(int profit) {
+	public void setProfit(BigDecimal profit) {
 		this.profit = profit;
 	}
 	public int getTotalCartsFailed() {
@@ -51,11 +50,15 @@ public class ReportDTO {
 	public void setTotalCartsFailed(int totalCartsFailed) {
 		this.totalCartsFailed = totalCartsFailed;
 	}
-	public int getTotalCartProcessed() {
-		return totalCartProcessed;
+	public int getTotalCartsProcessed() {
+		return totalCartsProcessed;
 	}
-	public void setTotalCartProcessed(int totalCartProcessed) {
-		this.totalCartProcessed = totalCartProcessed;
+	public void setTotalCartsProcessed(int totalCartProcessed) {
+		this.totalCartsProcessed = totalCartProcessed;
+	}
+	public ReportDTO() {
+		super();
+		
 	}
 	
 	 

@@ -3,7 +3,7 @@ package com.context.utils;
 
 public enum Status {
 
-	NEW ,
+	NEW,
 	PROCESSED,
 	READY,
 	FAILED,

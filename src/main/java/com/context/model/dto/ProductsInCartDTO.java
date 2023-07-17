@@ -2,27 +2,20 @@ package com.context.model.dto;
 
 import java.math.BigDecimal;
 
-
-public class ProductDTO {
-
+public class ProductsInCartDTO {
 	
 	private Long id;
 	private String description;
 	private BigDecimal unitPrice;
-	private Integer stock;
+	private int quantity;
 	
-	public ProductDTO() {
-		super();
 	
-	}
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	
 	public String getDescription() {
 		return description;
 	}
@@ -35,11 +28,11 @@ public class ProductDTO {
 	public void setUnitPrice(BigDecimal unitPrice) {
 		this.unitPrice = unitPrice;
 	}
-	
-	public Integer getStock() {
-		return stock;
+	public int getQuantity() {
+		return quantity;
 	}
-	public void setStock(Integer quantity) {
-		this.stock = quantity;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
+
 }

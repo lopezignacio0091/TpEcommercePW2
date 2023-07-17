@@ -2,9 +2,13 @@ package com.context.model;
 
 import java.math.BigDecimal;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 
 
 
@@ -16,7 +20,16 @@ public class Product {
 	private BigDecimal unitPrice;
 	private Integer stock;
 	
+	@ManyToOne(cascade=CascadeType.ALL)
+    private Report report;
 	
+	
+	public Report getReport() {
+		return report;
+	}
+	public void setReport(Report report) {
+		this.report = report;
+	}
 	public Product() {
 		super();
 		

@@ -20,17 +20,17 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.context.utils.Status;
 
 @Entity
-public class Cart {
+public class Cart implements  Comparable<Cart>{
 
 	private @Id @GeneratedValue Long id;
 	private String fullName; 
 	private String email ;
-	private LocalDate creationDate ;
+	private Date creationDate = new Date (System.currentTimeMillis());
 	@OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private Set<CartProduct> products = new HashSet<CartProduct>();
-	private BigDecimal total ;
-	private Status status; 
+	private BigDecimal total = new BigDecimal("0");
+	private Status status = Status.NEW; 
 	private Date checkDate ;
 
 	
@@ -71,10 +71,10 @@ public class Cart {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public LocalDate getCreationDate() {
+	public Date getCreationDate() {
 		return creationDate;
 	}
-	public void setCreationDate(LocalDate creationDate) {
+	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
 	}
 	
@@ -101,4 +101,11 @@ public class Cart {
 		this.status = status;
 	}
 
-}
+	@Override
+	public int compareTo(Cart arg0) {
+		 if (getCheckDate() == null || arg0.getCheckDate() == null) {
+		      return 0;
+		    }
+		    return getCheckDate().compareTo(arg0.getCheckDate());
+		  }
+	}

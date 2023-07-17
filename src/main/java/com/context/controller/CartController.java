@@ -38,25 +38,17 @@ public class CartController {
 		
 		
 		@PostMapping(path = "/carts")
-		public ResponseEntity<Object> postCart(@Valid @RequestBody CartDTO cartDTO ) {		
-				Long id = service.post(cartDTO);
-				if(id == null) {
-						return new ResponseEntity<>("Invalid data requerid ", HttpStatus.FAILED_DEPENDENCY);
-				}else {
-					return new ResponseEntity<>("Cart successfully Created. Id: " + id, HttpStatus.CREATED);
-				}
-					
-			}	
-			
+		public ResponseEntity<Object> postCart(@Valid @RequestBody CartDTO cartDTO ) {
+			Long id = service.post(cartDTO);		
+			return new ResponseEntity<>("Cart successfully Created. Id: " + id, HttpStatus.CREATED);					
+		}	
+				
 	@PostMapping(path = "/carts/{id}/products")
 		public ResponseEntity<Object> postProductToCart(@PathVariable long id, @RequestBody CartProductDTO cartproductDTO){
-			if(id == 0 || cartproductDTO.getQuantity() == null || cartproductDTO.getId()== null) {
-				return new ResponseEntity<>("Invalid data" + id, HttpStatus.NOT_IMPLEMENTED);
-			}else {
-				Long Id = service.postId(id, cartproductDTO);
+					Long Id = service.postId(id, cartproductDTO);
 				return new ResponseEntity<>("Product add in Cart" + ": " +Id, HttpStatus.OK);
 			}
-		}
+	
 		
 		@DeleteMapping(path = "/carts/{id}/products/{idProduct}")
 		public ResponseEntity<Object> postProductToCart(@PathVariable long id, @PathVariable long idProduct ){
